@@ -9,7 +9,7 @@ from src.main.api.models.create_user_request import CreateUserRequest
 
 class TestCreditRequest:
     def test_create_account(self):
-        create_user_request = CreateUserRequest(username='Sam36', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
+        create_user_request = CreateUserRequest(username='Sam86', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -17,7 +17,7 @@ class TestCreditRequest:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam36', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam86', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -25,7 +25,7 @@ class TestCreditRequest:
         credit_request_model = CreditRequestModel(accountId=account_id, amount=5000, termMonths=12)
 
         response = CreditRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam36', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam86', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(credit_request_model)
 
@@ -36,7 +36,7 @@ class TestCreditRequest:
     def test_credit_request_without_permission(self):
 
         # Создаем пользователся без права на кредитование (ROLE_USER).
-        create_user_request = CreateUserRequest(username='Sam37', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam87', password='Pas!sw0rd', role='ROLE_USER')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -44,7 +44,7 @@ class TestCreditRequest:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam37', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam87', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -52,7 +52,7 @@ class TestCreditRequest:
         credit_request_model = CreditRequestModel(accountId=account_id, amount=5000, termMonths=12)
 
         response = CreditRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam37', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam87', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_forbidden()
         ).post(credit_request_model)
 
@@ -60,7 +60,7 @@ class TestCreditRequest:
 
 
     def test_credit_request_with_invalid_amount(self):
-        create_user_request = CreateUserRequest(username='Sam39', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
+        create_user_request = CreateUserRequest(username='Sam88', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -68,7 +68,7 @@ class TestCreditRequest:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam39', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam88', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -80,7 +80,7 @@ class TestCreditRequest:
             credit_request_model = CreditRequestModel(accountId=account_id, amount=boundary_values[i], termMonths=12)
 
             response = CreditRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam39', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam88', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_bad()
             ).post(credit_request_model)
 

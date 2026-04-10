@@ -9,7 +9,7 @@ from src.main.api.specs.response_specs import ResponseSpecs
 @pytest.mark.api
 class TestCreateAccount:
     def test_create_account(self):
-        create_user_request = CreateUserRequest(username='Sam24', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam80', password='Pas!sw0rd', role='ROLE_USER')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -17,7 +17,7 @@ class TestCreateAccount:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam24', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam80', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
 

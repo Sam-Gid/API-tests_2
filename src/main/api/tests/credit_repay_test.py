@@ -12,7 +12,7 @@ from src.main.api.models.credit_request_model import CreditRequestModel
 
 class TestCreditRepay:
     def test_credit_repay(self):
-        create_user_request = CreateUserRequest(username='Sam48', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
+        create_user_request = CreateUserRequest(username='Sam82', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -20,7 +20,7 @@ class TestCreditRepay:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam48', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam82', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -28,7 +28,7 @@ class TestCreditRepay:
         credit_request_model = CreditRequestModel(accountId=account_id, amount=5000, termMonths=12)
 
         response = CreditRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam48', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam82', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(credit_request_model)
 
@@ -40,7 +40,7 @@ class TestCreditRepay:
         credit_repay_request = CreditRepayRequest(creditId=credit_id, accountId=account_id, amount=5000)
 
         response = CreditRepayRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam48', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam82', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_ok()
         ).post(credit_repay_request)
 
@@ -48,7 +48,7 @@ class TestCreditRepay:
 
 
     def test_credit_repay_with_invalid_amount(self):
-        create_user_request = CreateUserRequest(username='Sam49', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
+        create_user_request = CreateUserRequest(username='Sam83', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -56,7 +56,7 @@ class TestCreditRepay:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam49', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam83', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -64,7 +64,7 @@ class TestCreditRepay:
         credit_request_model = CreditRequestModel(accountId=account_id, amount=5000, termMonths=12)
 
         response = CreditRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam49', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam83', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(credit_request_model)
 
@@ -80,7 +80,7 @@ class TestCreditRepay:
             credit_repay_request = CreditRepayRequest(creditId=credit_id, accountId=account_id, amount=boundary_values[i])
 
             response = CreditRepayRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam49', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam83', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_unprocessable()
             ).post(credit_repay_request)
 
@@ -88,7 +88,7 @@ class TestCreditRepay:
 
 
     def test_repay_closed_credit(self):
-        create_user_request = CreateUserRequest(username='Sam51', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
+        create_user_request = CreateUserRequest(username='Sam84', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -96,7 +96,7 @@ class TestCreditRepay:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam51', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam84', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
         account_id = response.id
@@ -104,7 +104,7 @@ class TestCreditRepay:
         credit_request_model = CreditRequestModel(accountId=account_id, amount=5000, termMonths=12)
 
         response = CreditRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam51', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam84', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(credit_request_model)
 
@@ -123,7 +123,7 @@ class TestCreditRepay:
         # Проверяем, что при повторном погашении кредита получаем ошибку.
         for i in range(2):
             response = CreditRepayRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam51', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam84', password='Pas!sw0rd'),
                 response_spec=expected_responses[i]
             ).post(credit_repay_request)
 

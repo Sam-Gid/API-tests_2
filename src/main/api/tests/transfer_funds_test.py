@@ -11,7 +11,7 @@ from src.main.api.models.create_user_request import CreateUserRequest
 
 class TestTransferFunds:
     def test_valid_transfer_funds(self):
-        create_user_request = CreateUserRequest(username='Sam61', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam92', password='Pas!sw0rd', role='ROLE_USER')
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
             response_spec=ResponseSpecs.request_ok()
@@ -23,7 +23,7 @@ class TestTransferFunds:
         # Id аккаунтов записываются в переменную "accounts".
         for _ in range(2):
             response = CreateAccountRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam61', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam92', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_created()
             ).post(None)
 
@@ -34,7 +34,7 @@ class TestTransferFunds:
         deposit_account_request = DepositAccountRequest(accountId=account_one_id, amount=1000.5)
 
         DepositAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam61', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam92', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_ok()
         ).post(deposit_account_request)
 
@@ -42,7 +42,7 @@ class TestTransferFunds:
                                                       amount=500.5)
 
         response = TransferFundsRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam61', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam92', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_ok()
         ).post(transfer_funds_request)
 
@@ -50,7 +50,7 @@ class TestTransferFunds:
 
 
     def test_transfer_founds_with_invalid_amount(self):
-        create_user_request = CreateUserRequest(username='Sam60', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam93', password='Pas!sw0rd', role='ROLE_USER')
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
             response_spec=ResponseSpecs.request_ok()
@@ -62,7 +62,7 @@ class TestTransferFunds:
         # Id аккаунтов записываются в переменную "accounts".
         for _ in range(2):
             response = CreateAccountRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam60', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam93', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_created()
             ).post(None)
 
@@ -73,7 +73,7 @@ class TestTransferFunds:
         deposit_account_request = DepositAccountRequest(accountId=account_one_id, amount=1000.5)
 
         DepositAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam60', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam93', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_ok()
         ).post(deposit_account_request)
 
@@ -85,7 +85,7 @@ class TestTransferFunds:
                                                           amount=boundary_values[i])
 
             response = TransferFundsRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam60', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam93', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_bad()
             ).post(transfer_funds_request)
 

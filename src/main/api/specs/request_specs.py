@@ -1,10 +1,10 @@
 import requests
+from src.main.api.configs.config import Config
 from src.main.api.models.login_user_request import LoginUserRequest
 from src.main.api.models.login_user_response import LoginUserResponse
 
 
 class RequestSpecs:
-    BASE_URL = 'http://localhost:4111/api'
     @staticmethod
     def base_headers():
         return {'Content-Type': 'application/json',
@@ -28,16 +28,11 @@ class RequestSpecs:
             headers = RequestSpecs.base_headers()
             headers['Authorization'] = f'Bearer {token}'
 
-            return {
-                'headers': headers,
-                'base_url': RequestSpecs.BASE_URL
-            }
+            return headers
 
         raise Exception('Failed to login')
 
     @staticmethod
     def unauth_headers():
-        return {
-            'headers': RequestSpecs.base_headers(),
-            'base_url': RequestSpecs.BASE_URL
-        }
+        return RequestSpecs.base_headers()
+

@@ -9,22 +9,11 @@ from src.main.api.specs.response_specs import ResponseSpecs
 
 @pytest.mark.api
 class TestUserLogin:
-    def test_login_user(self):
-        create_user_request = CreateUserRequest(username='Sam21', password='Pas!sw0rd', role='ROLE_USER')
+    def test_login_user(self, api_manager):
+        login_user_request = LoginUserRequest(username='admin', password='123456')
 
-        response = CreateUserRequester(
-            request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
-            response_spec=ResponseSpecs.request_ok()
-        ).post(create_user_request)
-
-        assert create_user_request.username == response.username
-        assert create_user_request.role == response.role
-
-        login_user_request = LoginUserRequest(username='Sam21', password='Pas!sw0rd')
-
-        response = LoginUserRequester(
-            request_spec=RequestSpecs.unauth_headers(),
-            response_spec=ResponseSpecs.request_ok()
-        ).post(login_user_request)
+        response = api_manager.admin_steps.login_user(login_user_request)
 
         assert login_user_request.username == response.user.username
+        assert response.user.role == 'ROLE_ADMIN'
+

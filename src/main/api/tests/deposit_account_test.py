@@ -10,7 +10,7 @@ from src.main.api.models.create_user_request import CreateUserRequest
 
 class TestDepositAccount:
     def test_valid_deposit_account(self):
-        create_user_request = CreateUserRequest(username='Sam56', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam89', password='Pas!sw0rd', role='ROLE_USER')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -18,7 +18,7 @@ class TestDepositAccount:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam56', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam89', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
 
@@ -27,7 +27,7 @@ class TestDepositAccount:
         deposit_account_request = DepositAccountRequest(accountId=account_id, amount=5000)
 
         response = DepositAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam56', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam89', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_ok()
         ).post(deposit_account_request)
 
@@ -35,7 +35,7 @@ class TestDepositAccount:
 
 
     def test_deposit_account_with_invalid_amount(self):
-        create_user_request = CreateUserRequest(username='Sam55', password='Pas!sw0rd', role='ROLE_USER')
+        create_user_request = CreateUserRequest(username='Sam90', password='Pas!sw0rd', role='ROLE_USER')
 
         CreateUserRequester(
             request_spec=RequestSpecs.auth_headers(username='admin', password='123456'),
@@ -43,7 +43,7 @@ class TestDepositAccount:
         ).post(create_user_request)
 
         response = CreateAccountRequester(
-            request_spec=RequestSpecs.auth_headers(username='Sam55', password='Pas!sw0rd'),
+            request_spec=RequestSpecs.auth_headers(username='Sam90', password='Pas!sw0rd'),
             response_spec=ResponseSpecs.request_created()
         ).post(None)
 
@@ -56,7 +56,7 @@ class TestDepositAccount:
             deposit_account_request = DepositAccountRequest(accountId=account_id, amount=boundary_values[i])
 
             response = DepositAccountRequester(
-                request_spec=RequestSpecs.auth_headers(username='Sam55', password='Pas!sw0rd'),
+                request_spec=RequestSpecs.auth_headers(username='Sam90', password='Pas!sw0rd'),
                 response_spec=ResponseSpecs.request_bad()
             ).post(deposit_account_request)
 
