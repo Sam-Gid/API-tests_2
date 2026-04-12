@@ -8,4 +8,5 @@ dependencies = [
     "pydantic>=2.12.0",
     "python-dotenv>=1.1.0",
     "selenium>=4.35.0",
+    "rstr>=3.2.2",
 ]

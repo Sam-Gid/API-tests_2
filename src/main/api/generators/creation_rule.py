@@ -1,0 +1,8 @@
+from dataclasses import dataclass
+
+
+@dataclass
+class CreationRule:
+    regex: str | None
+    ge: float
+    le: float
