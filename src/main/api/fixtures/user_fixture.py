@@ -1,6 +1,7 @@
 import pytest
 from src.main.api.generators.model_generator import RandomModelGenerator
 from src.main.api.models.create_credit_user_request import CreateCreditUserRequest
+from src.main.api.models.create_user_response import CreateUserResponse
 from src.main.api.models.transfer_funds_request import TransferFundsRequest
 from src.main.api.models.account_deposit_request import AccountDepositRequest
 from src.main.api.models.credit_repay_request import CreditRepayRequest
@@ -46,23 +47,48 @@ def create_transfer_funds_accounts(api_manager, create_user):
 @pytest.fixture
 def create_credit_user(api_manager):
     # Создаем пользователя для кредитного счета (ROLE_CREDIT_SECRET).
-    user_request = CreateCreditUserRequest(username='Sam07', password='Pas!sw0rd', role='ROLE_CREDIT_SECRET')
-    api_manager.admin_steps.create_user(user_request)
-    return user_request
+    create_user_request = RandomModelGenerator.generate(CreateCreditUserRequest)
+    api_manager.admin_steps.create_user(create_user_request)
+    return create_user_request
 
 
 @pytest.fixture
-def create_credit_account(api_manager, create_credit_user):
-    # Создаем банковский счет используя кредитный аккаунт (create_credit_user)
-    account = api_manager.user_steps.create_account(create_credit_user)
+def credit_user_details(api_manager, create_credit_user):
+    user_details = CreateUserResponse(
+        id=create_credit_user.id,
+        username=create_credit_user.username,
+        password=create_credit_user.password,
+        role=create_credit_user.role
+    )
+    return user_details
 
-    credit_request_model = CreditRequestModel(accountId=account.id, amount=5000, termMonths=12)
+
+@pytest.fixture
+def create_credit_account_request(api_manager, create_credit_user):
+    # Создаем банковский счет используя кредитный аккаунт (create_credit_user)
+    create_credit_account = api_manager.user_steps.create_account(create_credit_user)
+
+    return create_credit_account
+
+
+@pytest.fixture
+def credit_request_details(api_manager, create_credit_user, create_credit_account_request):
+    credit_request_model = CreditRequestModel(accountId=create_credit_account_request.id, amount=5000, termMonths=12)
     return credit_request_model
 
 
 @pytest.fixture
-def create_credit_request(api_manager, create_credit_user, create_credit_account):
-    response = api_manager.user_steps.valid_credit_request(create_credit_user, create_credit_account)
+def create_credit_request(api_manager, create_credit_user, credit_request_details):
+    create_credit = api_manager.user_steps.valid_credit_request(create_credit_user, credit_request_details)
 
-    credit_repay_request = CreditRepayRequest(creditId=response.creditId, accountId=response.id, amount=5000)
-    return credit_repay_request
+    return create_credit
+
+
+@pytest.fixture
+def credit_repay_details(api_manager, credit_user_details, create_credit_request):
+    repay_details = CreditRepayRequest(
+        creditId= create_credit_request.creditId,
+        accountId=create_credit_request.accountId,
+        amount=5000
+    )
+    return repay_details

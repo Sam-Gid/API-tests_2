@@ -2,7 +2,7 @@ from src.main.api.models.base_model import BaseModel
 
 
 class CreditRequestResponse(BaseModel):
-    id: int
+    accountId: int
     amount: int
     termMonths: int
     balance: float

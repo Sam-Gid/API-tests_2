@@ -1,8 +1,8 @@
 
 
 class TestCreditRepay:
-    def test_credit_repay(self, api_manager, create_credit_user, create_credit_request):
-        response = api_manager.user_steps.credit_repay_request(create_credit_user, create_credit_request)
+    def test_credit_repay(self, api_manager, create_credit_user, credit_repay_details):
+        response = api_manager.user_steps.credit_repay_request(create_credit_user, credit_repay_details)
 
         assert response.amountDeposited == 5000
 
