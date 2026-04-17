@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-
 from src.main.api.db.models.account_table import Account
 
 

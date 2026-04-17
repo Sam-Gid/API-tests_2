@@ -1,10 +1,18 @@
 import pytest
+from sqlalchemy.orm import Session
+
+from src.main.api.db.crud.account_crud import AccountCrudDb as Account
 
 
 class TestTransferFunds:
-    def test_valid_transfer_funds(self, api_manager, create_user_request, transfer_funds_request):
+    def test_valid_transfer_funds(self, api_manager, create_user_request, transfer_funds_request, db_session: Session):
         response = api_manager.user_steps.transfer_funds_request(create_user_request, transfer_funds_request)
         assert response.fromAccountIdBalance == 1000
+
+        account1_from_db = Account.get_account_by_id(db_session, response.fromAccountId)
+        account2_from_db = Account.get_account_by_id(db_session, response.toAccountId)
+        print(account1_from_db.balance)
+        print(account2_from_db.balance)
 
 
     @pytest.mark.parametrize(

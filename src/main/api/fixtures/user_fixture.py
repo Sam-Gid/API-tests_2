@@ -88,15 +88,15 @@ def credit_request_details(api_manager, create_credit_account_response):
 
 
 @pytest.fixture
-def create_credit_response(api_manager, create_credit_user_request, credit_request_details):
+def create_credit(api_manager, create_credit_user_request, credit_request_details):
     create_credit_response = api_manager.user_steps.valid_credit_request(create_credit_user_request, credit_request_details)
     return create_credit_response
 
 
 @pytest.fixture
-def credit_repay_request(api_manager, create_credit_response):
+def credit_repay_request(api_manager, create_credit):
     credit_repay_request = CreditRepayRequest(
-        creditId= create_credit_response.creditId,
-        accountId=create_credit_response.id,
+        creditId= create_credit.creditId,
+        accountId=create_credit.id,
         amount=5000)
     return credit_repay_request
