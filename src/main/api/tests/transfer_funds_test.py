@@ -12,25 +12,21 @@ class TestTransferFunds:
             funded_account,
             db_session: Session
     ):
-        funded_account_balance = funded_account.balance
-        expected_balance = funded_account_balance - transfer_funds_request.amount
+        sender_balance_before = Account.get_account_by_id(db_session, transfer_funds_request.fromAccountId).balance
+        recipient_balance_before = Account.get_account_by_id(db_session, transfer_funds_request.toAccountId).balance
 
         response = api_manager.user_steps.transfer_funds_request(create_user_request, transfer_funds_request)
-        assert response.fromAccountIdBalance == expected_balance, (
-            f'Ошибка: Неверный баланс отправителя. '
-            f'Ожидалось: {expected_balance}, получено: {response.fromAccountIdBalance}'
-        )
 
-        source_account = Account.get_account_by_id(db_session, transfer_funds_request.fromAccountId)
-        target_account = Account.get_account_by_id(db_session, transfer_funds_request.toAccountId)
-        assert source_account.balance == expected_balance, (
-            f'Ошибка: Неверный баланс отправителя в БД. '
-            f'Ожидалось: {expected_balance}, получено: {source_account.balance}'
-        )
-        assert target_account.balance == transfer_funds_request.amount, (
-            f'Ошибка: Неверный баланс получателя в БД (target_account_balance). '
-            f'Ожидалось: {transfer_funds_request.amount}, получено: {target_account.balance}'
-        )
+        # Получаем последние транзакции отправителя и получателя.
+        sender_transaction =  api_manager.user_steps.get_last_transaction(create_user_request, response.fromAccountId)
+        recipient_transaction = api_manager.user_steps.get_last_transaction(create_user_request, response.toAccountId)
+        assert sender_transaction.amount == -transfer_funds_request.amount
+        assert recipient_transaction.amount == transfer_funds_request.amount
+
+        sender_balance_after = Account.get_account_by_id(db_session, transfer_funds_request.fromAccountId).balance
+        recipient_balance_after = Account.get_account_by_id(db_session, transfer_funds_request.toAccountId).balance
+        assert transfer_funds_request.amount == sender_balance_before - sender_balance_after
+        assert transfer_funds_request.amount == recipient_balance_after - recipient_balance_before
 
 
     @pytest.mark.parametrize(
