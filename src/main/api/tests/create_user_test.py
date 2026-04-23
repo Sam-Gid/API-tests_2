@@ -1,4 +1,5 @@
 import pytest
+from http import HTTPStatus
 from sqlalchemy.orm import Session
 from src.main.api.classes.api_manager import ApiManager
 from src.main.api.generators.model_generator import RandomModelGenerator
@@ -33,10 +34,13 @@ class TestCreateUser:
             ('Maxx6', 'pasSsword'),
         ]
     )
-    def test_create_user_invalid(self, username, password, api_manager, db_session: Session):
+    def test_create_user_invalid(self, username: str, password: str, api_manager: ApiManager, db_session: Session):
         create_user_request = CreateUserRequest(username=username, password=password, role='ROLE_USER')
         response = api_manager.admin_steps.create_invalid_user(create_user_request)
-        assert response.status_code == 400
+        assert response.status_code == HTTPStatus.BAD_REQUEST, (
+            f'Ошибка: Неправильный статус код. '
+            f'Ожидалось: {HTTPStatus.BAD_REQUEST}, получено: {response.status_code}'
+        )
 
         user_from_db = User.get_user_by_username(db_session, create_user_request.username)
         assert user_from_db is None, 'Ошибка: Пользователь обнаружен в БД'

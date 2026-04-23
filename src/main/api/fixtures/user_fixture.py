@@ -29,7 +29,7 @@ def login_admin_request(api_manager: ApiManager) -> LoginUserRequest:
 
 @pytest.fixture
 def create_account_response(api_manager: ApiManager, create_user_request: CreateUserRequest) -> CreateAccountResponse:
-    # Создаем банковский счет для обычного пользователя (create_user).
+    # Создаем банковский счет для обычного пользователя (ROLE_USER).
     create_account_response = api_manager.user_steps.create_account(create_user_request)
     return create_account_response
 
@@ -125,5 +125,3 @@ def credit_repay_request(api_manager: ApiManager, create_credit: CreditRequestRe
         accountId=create_credit.id,
         amount=5000)
     return credit_repay_request
-
-

@@ -5,6 +5,7 @@ from src.main.api.foundation.requesters.crud_requester import CrudRequester
 from src.main.api.models.base_model import BaseModel
 import allure
 
+
 class ValidateCrudRequester(HttpRequester):
     def __init__(self, request_spec, endpoint, response_spec):
         super().__init__(request_spec, endpoint, response_spec)

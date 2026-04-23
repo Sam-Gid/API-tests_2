@@ -1,4 +1,4 @@
-from src.main.api.models.get_transactions_response import GetTransactionsResponse
+from src.main.api.models.create_user_response import CreateUserResponse
 from src.main.api.models.transfer_funds_request import TransferFundsRequest
 from src.main.api.models.credit_repay_request import CreditRepayRequest
 from src.main.api.foundation.requesters.crud_requester import CrudRequester
@@ -139,4 +139,3 @@ class UserSteps(BaseSteps):
         transactions = self.get_transactions(create_user_request, account_id)
         last_transaction = max(transactions.transactions, key = lambda t: t.createdAt)
         return last_transaction
-
