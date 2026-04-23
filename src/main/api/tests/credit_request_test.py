@@ -1,14 +1,18 @@
 import pytest
+from http import HTTPStatus
 from sqlalchemy.orm import Session
+from src.main.api.classes.api_manager import ApiManager
 from src.main.api.db.models.credit_table import Credit
+from src.main.api.models.create_credit_user_request import CreateCreditUserRequest
+from src.main.api.models.create_user_request import CreateUserRequest
 from src.main.api.models.credit_request_model import CreditRequestModel
 
 
 class TestCreditRequest:
     def test_valid_credit_request(
             self,
-            api_manager,
-            create_credit_user_request,
+            api_manager: ApiManager,
+            create_credit_user_request: CreateCreditUserRequest,
             credit_request_details: CreditRequestModel,
             db_session: Session
     ):
@@ -22,14 +26,18 @@ class TestCreditRequest:
 
     def test_credit_request_without_permission(
             self,
-            api_manager,
-            create_user_request,
+            api_manager: ApiManager,
+            create_user_request: CreateUserRequest,
             credit_request_details: CreditRequestModel,
             db_session: Session
     ):
         # Используем пользователя без права на кредитование (create_user).
         response = api_manager.user_steps.invalid_role_credit_request(create_user_request, credit_request_details)
-        assert response.status_code == 403, 'Ошибка: Кредит успешно создан пользователем без права на кредитование'
+        assert response.status_code == HTTPStatus.FORBIDDEN, (
+            f'Ошибка: Неправильный статус код. '
+            f'Ожидалось: {HTTPStatus.FORBIDDEN}, получено: {response.status_code}'
+        )
+
 
         credit_from_db = db_session.query(Credit).filter(Credit.account_id == credit_request_details.accountId).first()
         assert credit_from_db is None, (
@@ -43,16 +51,19 @@ class TestCreditRequest:
     )
     def test_credit_request_with_invalid_amount(
             self,
-            api_manager,
-            create_credit_user_request,
-            credit_request_details,
-            credit_amount,
+            api_manager: ApiManager,
+            create_credit_user_request: CreateCreditUserRequest,
+            credit_request_details: CreditRequestModel,
+            credit_amount: int,
             db_session: Session
     ):
         # Проверяем, что суммы кредита ниже минимума и выше максимума отклоняются.
         credit_request_details.amount = credit_amount
         response = api_manager.user_steps.invalid_amount_credit_request(create_credit_user_request, credit_request_details)
-        assert response.status_code == 400, 'Ошибка, создан кредит на невалидную сумму'
+        assert response.status_code == HTTPStatus.BAD_REQUEST, (
+            f'Ошибка: Неправильный статус код. '
+            f'Ожидалось: {HTTPStatus.BAD_REQUEST}, получено: {response.status_code}'
+        )
 
         credit_from_db = db_session.query(Credit).filter(Credit.account_id == credit_request_details.accountId).first()
         assert credit_from_db is None, 'Ошибка, запись о кредите на невалидную сумму найдена в БД'
