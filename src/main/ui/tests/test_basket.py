@@ -1,5 +1,3 @@
-import time
-
 from playwright.sync_api import expect
 
 
@@ -102,12 +100,40 @@ def test_checkout_several_items(page):
 
     prices_text = page.locator(".inventory_item_price").all_text_contents()
     prices = [float(p.replace("$", "")) for p in prices_text]
-    expected_total = sum(prices)
-
     tax_text = page.locator("[data-test='tax-label']").inner_text()
-    tax = tax_text.replace("$", "")
+    tax = float(tax_text.split('$')[1])
+    expected_total = sum(prices) + tax
 
     total_price_text = page.locator("[data-test='total-label']").inner_text()
-    total_price = total_price_text.replace("$", "")
+    total_price = float(total_price_text.split('$')[1])
 
-    assert float(total_price) == expected_total + float(tax)
+    assert total_price == expected_total
+
+    page.locator('[data-test="finish"]').click()
+
+    expect(
+        page.locator(".complete-header")).to_have_text("Thank you for your order!")
+
+
+def test_checkout_without_items(page):
+    page.goto("https://www.saucedemo.com/")
+    page.get_by_placeholder("Username").fill("standard_user")
+    page.get_by_placeholder("Password").fill("secret_sauce")
+    page.locator("#login-button").click()
+
+    page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
+
+    page.locator(".shopping_cart_link").click()
+
+    jacket = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
+    assert jacket.is_visible()
+
+    page.locator('[data-test="checkout"]').click()
+
+    page.get_by_placeholder("First Name").fill("Sam")
+    page.get_by_placeholder("Last Name").fill("Gid")
+
+    page.locator('[data-test="continue"]').click()
+
+    error_message = page.locator('[data-test="error"]')
+    expect(error_message).to_have_text("Error: Postal Code is required")
