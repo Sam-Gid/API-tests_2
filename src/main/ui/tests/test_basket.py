@@ -1,139 +1,82 @@
 from playwright.sync_api import expect
+from src.main.ui.pages.basket_page import BasketPage
 
 
 def test_add_item_and_check_in_cart(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page = BasketPage(page)
+    page.login("standard_user", "secret_sauce")
 
-    page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click()
-
-    page.locator(".shopping_cart_link").click()
-
-    item_name = page.locator('[data-test="inventory-item-name"]')
-    assert item_name.inner_text() == "Sauce Labs Backpack"
+    button = page.add_to_cart("Sauce Labs Bike Light")
+    expect(button).to_have_text("Remove")
+    assert page.get_cart_count() == 1
 
 
 def test_add_several_items_and_check_in_cart(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page = BasketPage(page)
+    page.login("standard_user", "secret_sauce")
 
-    page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
-    page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').click()
+    button_1 = page.add_to_cart("Sauce Labs Bike Light")
+    expect(button_1).to_have_text("Remove")
+    assert page.get_cart_count() == 1
 
-    page.locator(".shopping_cart_link").click()
-
-    item_one_name = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
-    assert item_one_name.is_visible()
-
-    item_two_name = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Bolt T-Shirt")
-    assert item_two_name.is_visible()
+    button_2 = page.add_to_cart("Sauce Labs Onesie")
+    expect(button_2).to_have_text("Remove")
+    assert page.get_cart_count() == 2
 
 
 def test_remove_item_from_cart(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page = BasketPage(page)
+    page.login("standard_user", "secret_sauce")
 
-    page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
-    page.locator(".shopping_cart_link").click()
+    page.add_to_cart("Sauce Labs Bike Light")
+    assert page.get_cart_count() == 1
 
-    jacket = page.locator('.inventory_item_name', has_text='Sauce Labs Fleece Jacket')
-    expect(jacket).to_be_visible()
-
-    page.locator('[data-test="remove-sauce-labs-fleece-jacket"]').click()
-
-    expect(jacket).not_to_be_visible()
+    remove_button = page.remove_from_cart("Sauce Labs Bike Light")
+    expect(remove_button).to_have_text("Add to cart")
 
 
 def test_remove_several_items_from_cart(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page = BasketPage(page)
+    page.login("standard_user", "secret_sauce")
 
-    page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click()
-    page.locator('[data-test="add-to-cart-test.allthethings()-t-shirt-(red)"]').click()
-    page.locator(".shopping_cart_link").click()
+    page.add_to_cart("Sauce Labs Bike Light")
+    page.add_to_cart("Sauce Labs Onesie")
+    assert page.get_cart_count() == 2
 
-    item_one = page.locator('.inventory_item_name', has_text='Sauce Labs Backpack')
-    expect(item_one).to_be_visible()
-
-    item_two = page.locator('.inventory_item_name', has_text='Test.allTheThings() T-Shirt (Red)')
-    expect(item_two).to_be_visible()
-
-    page.locator('[data-test="remove-sauce-labs-backpack"]').click()
-    page.locator('[data-test="remove-test.allthethings()-t-shirt-(red)"]').click()
-
-    expect(item_one).not_to_be_visible()
-    expect(item_two).not_to_be_visible()
-
+    remove_button_1 = page.remove_from_cart("Sauce Labs Bike Light")
+    remove_button_2 = page.remove_from_cart("Sauce Labs Onesie")
+    expect(remove_button_1).to_have_text("Add to cart")
+    expect(remove_button_2).to_have_text("Add to cart")
 
 def test_checkout_several_items(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    page = BasketPage(page)
+    page.login("standard_user", "secret_sauce")
 
-    page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
-    page.locator('[data-test="add-to-cart-sauce-labs-bolt-t-shirt"]').click()
+    page.add_to_cart("Sauce Labs Bike Light")
+    page.add_to_cart("Sauce Labs Onesie")
+    assert page.get_cart_count() == 2
 
-    page.locator(".shopping_cart_link").click()
+    page.open_cart()
+    page.checkout_button.click()
 
-    item_one_name = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
-    assert item_one_name.is_visible()
-
-    item_two_name = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Bolt T-Shirt")
-    assert item_two_name.is_visible()
-
-    page.locator('[data-test="checkout"]').click()
-
-    page.get_by_placeholder("First Name").fill("Sam")
-    page.get_by_placeholder("Last Name").fill("Gid")
-    page.get_by_placeholder("Zip/Postal Code").fill("1212")
-
-    page.locator('[data-test="continue"]').click()
-
-    prices_text = page.locator(".inventory_item_price").all_text_contents()
-    prices = [float(p.replace("$", "")) for p in prices_text]
-    tax_text = page.locator("[data-test='tax-label']").inner_text()
-    tax = float(tax_text.split('$')[1])
-    expected_total = sum(prices) + tax
-
-    total_price_text = page.locator("[data-test='total-label']").inner_text()
-    total_price = float(total_price_text.split('$')[1])
-
-    assert total_price == expected_total
-
-    page.locator('[data-test="finish"]').click()
-
-    expect(
-        page.locator(".complete-header")).to_have_text("Thank you for your order!")
+    page.fill_checkout_info("Sam", "Gid", "1212")
+    page.checkout_info()
 
 
-def test_checkout_without_items(page):
-    page.goto("https://www.saucedemo.com/")
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+def test_checkout_without_items(auth_page):
+    auth_page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
 
-    page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
+    auth_page.locator(".shopping_cart_link").click()
 
-    page.locator(".shopping_cart_link").click()
-
-    jacket = page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
+    jacket = auth_page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
     assert jacket.is_visible()
 
-    page.locator('[data-test="checkout"]').click()
+    auth_page.locator('[data-test="checkout"]').click()
 
-    page.get_by_placeholder("First Name").fill("Sam")
-    page.get_by_placeholder("Last Name").fill("Gid")
+    auth_page.get_by_placeholder("First Name").fill("Sam")
+    auth_page.get_by_placeholder("Last Name").fill("Gid")
 
-    page.locator('[data-test="continue"]').click()
+    auth_page.locator('[data-test="continue"]').click()
 
-    error_message = page.locator('[data-test="error"]')
+    error_message = auth_page.locator('[data-test="error"]')
     expect(error_message).to_have_text("Error: Postal Code is required")

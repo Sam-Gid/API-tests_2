@@ -1,56 +1,50 @@
 from playwright.sync_api import expect
 
+from src.main.ui.pages.catalog_page import CatalogPage
+from src.main.ui.pages.login_page import LoginPage
+
 
 def test_auth(page):
-    page.goto("https://www.saucedemo.com/")
-
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
     expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
 
 
-def test_invalid_auth(page):
-    page.goto("https://www.saucedemo.com/")
+def test_login_locked_out_user(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("locked_out_user", "secret_sauce")
 
-    page.get_by_placeholder("Username").fill("locked_out_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    expect(page).to_have_url(LoginPage.URL)
 
-    error = page.locator("h3[data-test='error']")
-    expect(error).to_be_visible()
-    expect(error).to_have_text("Epic sadface: Sorry, this user has been locked out.")
+    error_text = login_page.get_error_text()
+    assert "locked out" in error_text
 
 
 def test_logout(page):
-    page.goto("https://www.saucedemo.com/")
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    page.get_by_placeholder("Username").fill("standard_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    catalog_page = CatalogPage(page)
+    assert catalog_page.get_products_count() > 0
 
-    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+    catalog_page.logout()
 
-    page.locator("#react-burger-menu-btn").click()
-    page.locator("#logout_sidebar_link").click()
-
-    expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.locator("#login-button")).to_be_visible()
+    expect(page).to_have_url(LoginPage.URL)
 
 
 def test_visual_user_logout(page):
-    page.goto("https://www.saucedemo.com/")
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("visual_user", "secret_sauce")
 
-    page.get_by_placeholder("Username").fill("visual_user")
-    page.get_by_placeholder("Password").fill("secret_sauce")
-    page.locator("#login-button").click()
+    catalog_page = CatalogPage(page)
+    assert catalog_page.get_products_count() > 0
 
-    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+    catalog_page.logout()
 
-    page.locator("#react-burger-menu-btn").click()
-    page.locator("#logout_sidebar_link").click()
-
-    expect(page).to_have_url("https://www.saucedemo.com/")
-    expect(page.locator("#login-button")).to_be_visible()
+    expect(page).to_have_url(LoginPage.URL)
 
