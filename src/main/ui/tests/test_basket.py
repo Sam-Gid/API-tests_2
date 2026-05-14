@@ -1,82 +1,106 @@
 from playwright.sync_api import expect
 from src.main.ui.pages.basket_page import BasketPage
+from src.main.ui.pages.catalog_page import CatalogPage
+from src.main.ui.pages.checkout_page import CheckoutPage
+from src.main.ui.pages.login_page import LoginPage
 
 
-def test_add_item_and_check_in_cart(page):
-    page = BasketPage(page)
-    page.login("standard_user", "secret_sauce")
+def test_add_item_and_check_in_basket(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    button = page.add_to_cart("Sauce Labs Bike Light")
-    expect(button).to_have_text("Remove")
-    assert page.get_cart_count() == 1
+    catalog_page = CatalogPage(page)
 
-
-def test_add_several_items_and_check_in_cart(page):
-    page = BasketPage(page)
-    page.login("standard_user", "secret_sauce")
-
-    button_1 = page.add_to_cart("Sauce Labs Bike Light")
-    expect(button_1).to_have_text("Remove")
-    assert page.get_cart_count() == 1
-
-    button_2 = page.add_to_cart("Sauce Labs Onesie")
-    expect(button_2).to_have_text("Remove")
-    assert page.get_cart_count() == 2
+    button = catalog_page.add_to_cart("Sauce Labs Bike Light")
+    expect(button).to_have_text('Remove')
 
 
-def test_remove_item_from_cart(page):
-    page = BasketPage(page)
-    page.login("standard_user", "secret_sauce")
+def test_add_several_items_and_check_in_basket(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    page.add_to_cart("Sauce Labs Bike Light")
-    assert page.get_cart_count() == 1
+    catalog_page = CatalogPage(page)
 
-    remove_button = page.remove_from_cart("Sauce Labs Bike Light")
-    expect(remove_button).to_have_text("Add to cart")
+    catalog_page.add_to_cart("Sauce Labs Bike Light")
+    catalog_page.add_to_cart("Sauce Labs Onesie")
+
+    basket_page = BasketPage(page)
+
+    basket_page.open_cart()
+    basket_page.expect_item_in_cart("Sauce Labs Bike Light")
+    basket_page.expect_item_in_cart("Sauce Labs Onesie")
 
 
-def test_remove_several_items_from_cart(page):
-    page = BasketPage(page)
-    page.login("standard_user", "secret_sauce")
+def test_remove_item_from_basket(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    page.add_to_cart("Sauce Labs Bike Light")
-    page.add_to_cart("Sauce Labs Onesie")
-    assert page.get_cart_count() == 2
+    catalog_page = CatalogPage(page)
 
-    remove_button_1 = page.remove_from_cart("Sauce Labs Bike Light")
-    remove_button_2 = page.remove_from_cart("Sauce Labs Onesie")
-    expect(remove_button_1).to_have_text("Add to cart")
-    expect(remove_button_2).to_have_text("Add to cart")
+    catalog_page.add_to_cart("Sauce Labs Bike Light")
+
+    basket_page = BasketPage(page)
+
+    basket_page.open_cart()
+    basket_page.remove_from_cart("Sauce Labs Bike Light")
+    basket_page.expect_item_not_in_cart("Sauce Labs Bike Light")
+
+
+def test_remove_several_items_from_basket(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
+
+    catalog_page = CatalogPage(page)
+
+    catalog_page.add_to_cart("Sauce Labs Bike Light")
+    catalog_page.add_to_cart("Sauce Labs Onesie")
+
+    basket_page = BasketPage(page)
+
+    basket_page.open_cart()
+    basket_page.remove_from_cart("Sauce Labs Bike Light")
+    basket_page.remove_from_cart("Sauce Labs Onesie")
+    basket_page.expect_item_not_in_cart("Sauce Labs Bike Light")
+    basket_page.expect_item_not_in_cart("Sauce Labs Onesie")
+
 
 def test_checkout_several_items(page):
-    page = BasketPage(page)
-    page.login("standard_user", "secret_sauce")
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    page.add_to_cart("Sauce Labs Bike Light")
-    page.add_to_cart("Sauce Labs Onesie")
-    assert page.get_cart_count() == 2
+    catalog_page = CatalogPage(page)
 
-    page.open_cart()
-    page.checkout_button.click()
+    catalog_page.add_to_cart("Sauce Labs Bike Light")
+    catalog_page.add_to_cart("Sauce Labs Onesie")
 
-    page.fill_checkout_info("Sam", "Gid", "1212")
-    page.checkout_info()
+    BasketPage(page).open_cart()
+
+    checkout_page = CheckoutPage(page)
+
+    checkout_page.open_checkout()
+    checkout_page.fill_checkout_info("Sam", "Gid", "1212")
+    checkout_page.start_checkout()
 
 
-def test_checkout_without_items(auth_page):
-    auth_page.locator('[data-test="add-to-cart-sauce-labs-fleece-jacket"]').click()
+def test_checkout_without_items(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.login("standard_user", "secret_sauce")
 
-    auth_page.locator(".shopping_cart_link").click()
+    CatalogPage(page).add_to_cart("Sauce Labs Bike Light")
 
-    jacket = auth_page.locator('[data-test="inventory-item-name"]', has_text="Sauce Labs Fleece Jacket")
-    assert jacket.is_visible()
+    BasketPage(page).open_cart()
 
-    auth_page.locator('[data-test="checkout"]').click()
+    checkout_page = CheckoutPage(page)
 
-    auth_page.get_by_placeholder("First Name").fill("Sam")
-    auth_page.get_by_placeholder("Last Name").fill("Gid")
-
-    auth_page.locator('[data-test="continue"]').click()
-
-    error_message = auth_page.locator('[data-test="error"]')
+    checkout_page.open_checkout()
+    page.get_by_placeholder("First Name").fill("Sam")
+    page.get_by_placeholder("Last Name").fill("Gid")
+    checkout_page.continue_button.click()
+    error_message = checkout_page.error_message
     expect(error_message).to_have_text("Error: Postal Code is required")
