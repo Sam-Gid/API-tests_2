@@ -1,8 +1,10 @@
 from playwright.sync_api import Page, expect
 
+from src.main.ui.utils.constansts import Urls
+
 
 class BasketPage:
-    URL = "https://www.saucedemo.com/"
+    URL = Urls.BASE
 
     def __init__(self, page: Page):
         self.page = page
@@ -10,6 +12,7 @@ class BasketPage:
 
     def open_cart(self):
         self.page.locator(".shopping_cart_link").click()
+        expect(self.page.locator("[data-test='title']")).to_have_text("Your Cart")
 
     def expect_item_in_cart(self, product_name: str):
         card = self.item_cards.filter(has_text=product_name)
@@ -26,9 +29,8 @@ class BasketPage:
         prices_text = self.item_cards.locator(".inventory_item_price").all_text_contents()
         return [float(p.replace("$", "")) for p in prices_text]
 
-    def get_item_total_price(self):
-        prices_text = self.item_cards.locator(".inventory_item_price").all_text_contents()
-        return sum(float(p.replace("$", "")) for p in prices_text)
+    def get_items_total_price(self):
+        return sum(self.get_item_prices())
 
     def remove_from_cart(self, product_name: str):
         card = self.item_cards.filter(has_text=product_name)

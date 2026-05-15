@@ -6,15 +6,16 @@ from src.main.ui.steps.login_steps import LoginSteps
 
 
 def test_auth(page):
-    steps = LoginSteps(page)
-    steps.open_login_page().login("standard_user", "secret_sauce")
+    login = LoginSteps(page)
+    login.open_login_page().login("standard_user", "secret_sauce")
     catalog_page = CatalogPage(page)
     assert catalog_page.get_products_count() > 0, "Ожидаем товары не странице каталога"
 
+
 def test_login_locked_out_user(page):
-    steps = LoginSteps(page)
-    steps.open_login_page().login("locked_out_user", "secret_sauce")
-    error_text = steps.get_error_text()
+    login = LoginSteps(page)
+    login.open_login_page().login("locked_out_user", "secret_sauce")
+    error_text = login.get_error_text()
     assert "locked out" in error_text, "Ожидаем сообщение о заблокированном пользователе"
 
 

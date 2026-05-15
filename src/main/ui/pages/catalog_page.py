@@ -1,7 +1,10 @@
 from playwright.sync_api import Page
 
+from src.main.ui.utils.constansts import Urls
+
+
 class CatalogPage:
-    URL = "https://www.saucedemo.com/"
+    URL = Urls.BASE
 
     def __init__(self, page: Page):
         self.page = page
