@@ -1,4 +1,4 @@
-from src.main.api.models.base_model import BaseModel
+from src.main.api.models.create_user_response import CreateUserResponse
 from src.main.api.models.transfer_funds_request import TransferFundsRequest
 from src.main.api.models.credit_repay_request import CreditRepayRequest
 from src.main.api.foundation.requesters.crud_requester import CrudRequester
@@ -123,3 +123,19 @@ class UserSteps(BaseSteps):
             ResponseSpecs.request_unprocessable()
         ).post(credit_repay_request)
         return response
+
+
+    def get_transactions(
+            self, create_user_request: CreateUserRequest, account_id: int):
+        response = CrudRequester(
+            RequestSpecs.auth_headers(username=create_user_request.username, password=create_user_request.password),
+            Endpoint.GET_TRANSACTION,
+            ResponseSpecs.request_ok()
+        ).get(account_id)
+        return response
+
+
+    def get_last_transaction(self, create_user_request: CreateUserRequest, account_id: int):
+        transactions = self.get_transactions(create_user_request, account_id)
+        last_transaction = max(transactions.transactions, key = lambda t: t.createdAt)
+        return last_transaction

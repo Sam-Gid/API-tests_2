@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 import requests
 from requests import Response
 from src.main.api.configs.config import Config
@@ -27,6 +27,14 @@ class CrudRequester(HttpRequester):
         )
         self.response_spec(response)
         return response
+
+    def get(self, attribute: Any):
+        response = requests.get(
+            url=f"{Config.fetch('backendUrl')}{self.endpoint.value.url}{attribute}",
+            headers=self.request_spec,
+        )
+        self.response_spec(response)
+        return self.endpoint.value.response_model.model_validate(response.json())
 
     def delete(self, user_id: int) -> BaseModel | Response:
         response = requests.delete(
